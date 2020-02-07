@@ -48,7 +48,7 @@ function showInfo()
 	    echo 
 	    ;;
 	'e')
-	    echo "[ error ] ${str}"
+	    echo  "[ error ] ${str}"
 	    ;;
 	*)
 	    esac
@@ -96,12 +96,14 @@ function checkSshPort()
 	# 端口确认：
 	local gport=`grep Port /etc/ssh/sshd_config 2>/dev/null -w | grep -v \# | awk -F ' ' '{print $2}'`
 	if [ "x${gport}" == "x" ] ; then
-		showInfo 'e' "${COLOR_RED}没有ssh的端口设置信息${COLOR_CLEAN}"
-		result=1
+		showInfo 'e' "没有ssh的端口设置信息，用的是默认端口22，建议修改！"
+		# 没端口的话不向下执行了
+		result=1				# 规范下，免得后续更新，这里是有问题的还是直接通过了
+		return  ${result}
 	fi
 
 	if [ ${gport} -eq 22 ] ; then
-		showInfo 'e' "${COLOR_RED}还是用的默认端口22${COLOR_CLEAN}"
+		showInfo 'e' "还是用的默认端口22"
 		result=1
 	else
 		showInfo 'i' "使用的ssh端口为:${gport}"
@@ -118,12 +120,12 @@ function checkSshPasswdLogin()
 	# 端口确认：
 	local gport=`grep PasswordAuthentication /etc/ssh/sshd_config 2>/dev/null -w | grep -v \# | awk -F ' ' '{print $1}'`
 	if [ "x${gport}" == "x" ] ; then
-		showInfo 'e' "${COLOR_RED}没有ssh的密码登录设置信息${COLOR_CLEAN}"
+		showInfo 'e' "没有ssh的密码登录设置信息"
 		result=1
 	fi
 
 	if [ "x${gport}" == "xon" ] ; then
-		showInfo 'e' "${COLOR_RED}启用了远程密码登录，有爆破危险!${COLOR_CLEAN}"
+		showInfo 'e' "启用了远程密码登录，有爆破危险!"
 		result=1
 	else
 		showInfo 'i' "未启用远程密码登录，无威胁！"
@@ -186,7 +188,7 @@ function main()
 			if [ $result -eq 0 ] ; then
 				echo -e "${COLOR_GRE_FLUSH}检查完毕，所有项检查正常！${COLOR_CLEAN}"
 			else
-				echo -e "${COLOR_RED_FLUSH}检查完毕，存在${result}项漏洞，建议处理！"
+				echo -e "${COLOR_RED_FLUSH}检查完毕，存在${result}项漏洞，建议处理！${COLOR_CLEAN}"
 			fi
 		;;
 	    s|+s)
