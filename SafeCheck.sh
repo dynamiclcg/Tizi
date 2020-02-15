@@ -13,6 +13,8 @@ COLOR_CLEAN="\e[0m"
 COLOR_RED_FLUSH="\e[31;5m"
 COLOR_GRE_FLUSH="\e[32;5m"
 
+
+
 # if [ "x${EUID}" != "x0" ] ; then
 # echo -e "${COLOR_RED_FLUSH}当前脚本必须用root用户执行脚本！！！${COLOR_CLEAN}"
 # exit 1
@@ -72,13 +74,13 @@ function checkBrute()
 {
     local result=1
     local info=`lastb | head -n 50 `
-    local count=`echo ${info} | wc -l`
+    local count=`echo "${info}" | wc -l`
     if [ ${count} -lt 3 ] ; then
 		showInfo 'i' "无大量密码爆破尝试记录"
 		return 0
     fi
 
-    local ips=`echo "${info}" |  awk -F ' ' '{print $1}' | sort | uniq`
+    local ips=`echo "${info}" |  awk -F ' ' '{print $1 $3}' | sort | uniq`
     showInfo 'e' "尝试暴力破解的用户ip如下:"
     for i in `echo "ips"`
     do
